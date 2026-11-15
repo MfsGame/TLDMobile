@@ -1,0 +1,1100 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title data-i18n="title">长途旅行 - 手机移植版</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+<style>
+:root {
+  --md-primary:#006a6a;
+  --md-primary-container:#6ff7f7;
+  --md-bg:#fdfbff;
+  --md-surface:#f5f3f7;
+  --md-surface-high:#ece9ef;
+  --md-text:#1a1b1f;
+  --md-sub:#5f6368;
+  --md-outline:#74777f;
+  --md-radius:28px;
+  --md-transition:.25s cubic-bezier(.2,0,0,1);
+}
+[data-theme="dark"]{
+  --md-bg:#111318;
+  --md-surface:#1b1b21;
+  --md-surface-high:#24242b;
+  --md-text:#e4e1e9;
+  --md-sub:#c5c6d0;
+  --md-outline:#8e9099;
+  --md-primary:#4fd8d8;
+  --md-primary-container:#005050;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+html,body{min-height:100%;font-family:Roboto,"Microsoft YaHei",system-ui,sans-serif;background:var(--md-bg);color:var(--md-text);line-height:1.6}
+a{text-decoration:none;color:inherit}
+body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+.main-wrapper{width:100%;min-height:100vh;display:flex;justify-content:center;padding:90px 20px 130px}
+.cube-wrapper{width:100%;max-width:780px;display:flex;flex-direction:column;gap:16px}
+.card{
+ background:var(--md-surface);
+ border-radius:var(--md-radius);
+ padding:24px;
+ border:1px solid transparent;
+ transition:transform var(--md-transition),background var(--md-transition),box-shadow var(--md-transition);
+}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.card-title{font-size:20px;font-weight:700;display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.card-title i{color:var(--md-primary)}
+.bar{position:fixed;z-index:999;display:flex;gap:8px;background:var(--md-surface);padding:6px;border-radius:100px;box-shadow:0 2px 12px rgba(0,0,0,.12)}
+.lang-bar{top:16px;left:50%;transform:translateX(-50%)}
+.header-icons{top:16px;right:16px}
+.footer-bar{bottom:16px;left:16px}
+.btn{
+ border:0;background:transparent;color:var(--md-text);
+ border-radius:100px;padding:10px 18px;
+ font-size:14px;font-weight:600;
+ touch-action:manipulation;
+ display:inline-flex;align-items:center;justify-content:center;gap:8px;
+ cursor:pointer;transition:var(--md-transition)
+}
+.btn:hover{background:rgba(0,106,106,.12)}
+.btn:active{transform:scale(.96)}
+.btn.active{background:var(--md-primary);color:white}
+.btn-download{width:100%;margin-bottom:10px;padding:15px;font-size:16px}
+.btn-gitlab{background:#fc6d26;color:#fff!important}
+.btn-steam{background:#171a21;color:#fff!important}
+.dynamic-text{text-align:center;color:var(--md-sub);padding:12px}.dynamic-text.is-changing{opacity:0}
+#toTop{
+ position:fixed;right:20px;bottom:70px;width:48px;height:48px;
+ border:0;border-radius:50%;background:var(--md-primary);
+ color:white;opacity:0;transition:.25s
+}
+#toTop.show{opacity:1}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.show{display:flex}
+.modal-box{width:100%;max-width:780px;max-height:85vh;overflow:auto;background:var(--md-surface);border-radius:32px;padding:28px;color:var(--md-text)}
+.modal-close{float:right;font-size:24px;cursor:pointer;color:var(--md-sub)}
+.modal-title{text-align:center;font-size:20px;font-weight:700;margin-bottom:20px}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--md-primary);color:#fff;padding:10px 20px;border-radius:100px;opacity:0}
+.toast.show{opacity:1}
+.spec-item{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--md-outline)}
+.spec-label,.update-date{color:var(--md-sub)}
+.spec-value,.update-version{color:var(--md-primary);font-weight:700}
+.feature-list{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.feature{display:flex;align-items:center;gap:10px}
+.feature i{color:var(--md-primary)}
+.screenshot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.screenshot{height:110px;border-radius:20px;background-size:cover;background-position:center;transition:.25s}
+.screenshot:hover{transform:scale(1.03)}
+.faq-question{display:flex;justify-content:space-between;color:var(--md-primary);cursor:pointer;font-weight:600}
+.faq-answer{display:none;color:var(--md-sub);margin-top:8px}
+.faq-answer.active{display:block}
+.community-grid,.tutorial-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.community-btn{padding:14px}
+@media(max-width:600px){
+.feature-list,.community-grid,.tutorial-grid{grid-template-columns:1fr}
+}
+
+.hero-card{position:relative;isolation:isolate;overflow:hidden;min-height:390px;padding:clamp(28px,6vw,58px);display:flex;align-items:center;background:linear-gradient(135deg,var(--md-surface) 0%,var(--md-surface-high) 100%)}
+.hero-card::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:repeating-linear-gradient(135deg,transparent 0 25px,rgba(0,106,106,.045) 25px 26px);mask-image:linear-gradient(110deg,#000,transparent 85%)}
+.hero-card::after{content:"TLD";position:absolute;z-index:-1;right:-12px;bottom:-70px;font-size:clamp(150px,32vw,300px);font-weight:900;line-height:1;letter-spacing:-.09em;color:var(--md-primary);opacity:.055;pointer-events:none}
+.hero-content{max-width:650px;position:relative}
+.hero-kicker{display:flex;align-items:center;gap:10px;color:var(--md-primary);font-size:11px;font-weight:800;letter-spacing:.24em;text-transform:uppercase;margin-bottom:20px}
+.hero-kicker::before{content:"";width:25px;height:2px;background:var(--md-primary);border-radius:2px}
+.hero-title{font-size:clamp(64px,12vw,112px);font-weight:900;letter-spacing:-.075em;line-height:.82;margin:0 0 25px}
+.hero-title span{display:block}
+.hero-title span+span{color:var(--md-primary);margin-left:clamp(28px,8vw,90px);margin-top:9px}
+.hero-lead{max-width:530px;color:var(--md-sub);font-size:15px;line-height:1.9}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:27px}
+.hero-action{min-height:48px;padding:0 22px;border-radius:100px;display:inline-flex;align-items:center;justify-content:center;gap:9px;font-weight:700;font-size:14px;background:var(--md-primary);color:#fff;box-shadow:0 4px 12px rgba(0,106,106,.18);transition:background .2s,box-shadow .2s,color .2s}
+.hero-action.secondary{background:transparent;color:var(--md-text);border:1px solid var(--md-outline);box-shadow:none}
+.hero-action:focus-visible,.btn:focus-visible{outline:3px solid var(--md-primary-container);outline-offset:3px}
+.card-title{letter-spacing:-.02em}
+.card{box-shadow:0 1px 3px rgba(0,0,0,.035)}
+.screenshot{background-color:var(--md-surface-high);background-size:cover;background-position:center;cursor:default;transform:none!important}
+.screenshot:hover{transform:none!important;filter:none}
+.btn-7723{background:#2468d8;color:#fff!important}
+.btn-7723:hover{background:#1856bd}
+.update-item{padding:16px 0;border-bottom:1px solid color-mix(in srgb,var(--md-outline) 25%,transparent)}
+.update-item:last-child{border-bottom:0}
+#textBox{transition:opacity .25s ease}
+.toast{z-index:10001;transition:opacity .2s}
+.modal-overlay{backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.modal-box{box-shadow:0 18px 60px rgba(0,0,0,.22)}
+@media (hover:none),(pointer:coarse){
+  .btn,.hero-action,#toTop,.community-btn,.tutorial-btn{transform:none!important;scale:none!important;transition:background-color .18s,color .18s,border-color .18s,filter .18s!important}
+  .btn:hover,.btn:active,.btn:focus,.hero-action:hover,.hero-action:active,.hero-action:focus,#toTop:active{transform:none!important;scale:none!important}
+  .card:hover{transform:none;box-shadow:0 1px 3px rgba(0,0,0,.035)}
+  .screenshot:hover{transform:none!important}
+}
+@media(max-width:600px){
+  .main-wrapper{padding:86px 14px 118px}
+  .cube-wrapper{gap:13px}
+  .hero-card{min-height:360px;padding:30px 23px}
+  .hero-title{font-size:clamp(62px,17vw,88px)}
+  .hero-lead{font-size:14px}
+  .hero-actions{gap:8px}
+  .hero-action{padding:0 17px;min-height:45px;font-size:13px}
+  .card{padding:20px;border-radius:24px}
+}
+
+
+
+:root{color-scheme:light;--md-shadow:0 2px 10px rgba(20,30,28,.08)}
+:root[data-theme="dark"]{color-scheme:dark;--md-shadow:0 3px 14px rgba(0,0,0,.24)}
+html{scroll-padding-top:92px}
+body{overflow-x:hidden;transition:background-color .25s ease,color .25s ease}
+.glass{
+  background:rgba(245,243,247,.94);
+  border:1px solid rgba(116,119,127,.20);
+  box-shadow:var(--md-shadow);
+  -webkit-backdrop-filter:blur(16px);
+  backdrop-filter:blur(16px)
+}
+:root[data-theme="dark"] .glass{
+  background:rgba(27,27,33,.94);
+  border-color:rgba(142,144,153,.22)
+}
+.bar{align-items:center;border:1px solid rgba(116,119,127,.20)}
+.card{border-color:rgba(116,119,127,.15);box-shadow:var(--md-shadow)}
+.visit-counter{
+  position:fixed;right:18px;bottom:20px;z-index:30;
+  padding:7px 12px;border-radius:999px;
+  color:var(--md-sub);background:var(--md-surface);
+  border:1px solid rgba(116,119,127,.25);font-size:12px;
+  box-shadow:var(--md-shadow)
+}
+#toTop{z-index:40;pointer-events:none}
+#toTop.show{pointer-events:auto}
+.agreement-text{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.85}
+.modal-overlay{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .22s ease,visibility .22s ease}
+.modal-overlay.show{display:flex;opacity:1;visibility:visible;pointer-events:auto}
+.modal-box{overscroll-behavior:contain}
+.modal-close{border:0;background:transparent;line-height:1}
+.faq-item{padding:5px 0;border-bottom:1px solid rgba(116,119,127,.28);border-bottom:1px solid color-mix(in srgb,var(--md-outline) 28%,transparent)}
+.faq-item:last-child{border-bottom:0}
+.faq-question{
+  width:100%;min-height:48px;padding:9px 2px;border:0;border-radius:12px;
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  background:transparent;color:var(--md-text);font:inherit;font-weight:650;
+  text-align:left;cursor:pointer;touch-action:manipulation
+}
+.faq-question i{flex:0 0 auto;color:var(--md-primary);transition:transform .2s ease}
+.faq-question[aria-expanded="true"] i{transform:rotate(180deg)}
+.faq-question:focus-visible{outline:3px solid var(--md-primary-container);outline-offset:2px}
+.faq-answer{display:none;color:var(--md-sub);padding:0 4px 12px;overflow-wrap:anywhere}
+.faq-answer.active{display:block}
+.btn-download{box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.btn-gitlab,.btn-steam,.btn-7723{min-height:50px}
+a[target="_blank"]{ -webkit-tap-highlight-color:transparent }
+button{font:inherit}
+@media(max-width:600px){
+  .lang-bar{left:12px;transform:none}
+  .header-icons{right:10px}
+  .bar{gap:2px;padding:4px}
+  .btn{padding:9px 12px}
+  .main-wrapper{padding-bottom:132px}
+  .visit-counter{display:none}
+  .modal-overlay{padding:10px}
+  .modal-box{max-height:calc(100vh - 20px);max-height:calc(100dvh - 20px);border-radius:24px;padding:22px}
+  .faq-question{min-height:46px}
+}
+@media(hover:none),(pointer:coarse){
+  .btn,.hero-action,#toTop,.faq-question,.community-btn,.tutorial-btn{
+    transform:none!important;scale:none!important;
+    transition:background-color .18s,color .18s,border-color .18s,filter .18s!important
+  }
+  .btn:hover,.btn:active,.btn:focus,.hero-action:hover,.hero-action:active,
+  .hero-action:focus,.faq-question:hover,.faq-question:active,#toTop:active{
+    transform:none!important;scale:none!important
+  }
+  .card:hover{transform:none;box-shadow:var(--md-shadow)}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+
+</style>
+
+</head>
+<body>
+
+<div class="bar lang-bar glass">
+  <button class="btn lang-btn active" data-lang="zh">中</button>
+  <button class="btn lang-btn" data-lang="en">EN</button>
+  <button class="btn lang-btn" data-lang="ru">RU</button>
+</div>
+
+<div class="bar header-icons glass">
+  <button type="button" class="btn header-icon-btn" id="themeToggle" aria-label="切换主题" aria-pressed="false">
+    <i class="fas fa-moon"></i>
+  </button>
+  <a href="https://github.com/MfsGame/The-long-drive-mobile" target="_blank" rel="noopener noreferrer" class="btn header-icon-btn">
+    <i class="fab fa-github"></i>
+  </a>
+</div>
+
+<main class="main-wrapper">
+  <div class="cube-wrapper">
+    <section class="card glass hero-card" id="home">
+      <div class="hero-content">
+        <div class="hero-kicker">THE LONG DRIVE · MOBILE</div>
+        <h1 class="hero-title"><span>The Long</span><span>Drive</span></h1>
+        <p class="hero-lead" data-i18n="desc">《The Long Drive》是一款独特的休闲驾驶模拟游戏，背景设定在广阔无垠的沙漠公路中。现在移植，您可以在手机上体验这款备受好评的独立游戏。</p>
+        <div class="hero-actions">
+          <a class="hero-action" href="#download"><i class="fas fa-download"></i><span data-i18n="download">立即下载</span></a>
+          <a class="hero-action secondary" href="#features"><i class="fas fa-compass"></i><span data-i18n="features">游戏特色</span></a>
+        </div>
+      </div>
+    </section>
+
+    <div class="card glass" id="features">
+      <h3 class="card-title"><i class="fas fa-star"></i> <span data-i18n="features">游戏特色</span></h3>
+      <div class="feature-list">
+        <div class="feature"><i class="fas fa-road"></i> <span data-i18n="f1">广阔开放世界沙漠</span></div>
+        <div class="feature"><i class="fas fa-cog"></i> <span data-i18n="f2">完全自定义车辆</span></div>
+        <div class="feature"><i class="fas fa-gas-pump"></i> <span data-i18n="f3">真实车辆维护系统</span></div>
+        <div class="feature"><i class="fas fa-sun"></i> <span data-i18n="f4">动态昼夜与天气</span></div>
+        <div class="feature"><i class="fas fa-search"></i> <span data-i18n="f5">探索废弃建筑</span></div>
+        <div class="feature"><i class="fas fa-mobile-alt"></i> <span data-i18n="f6">移动端专属优化</span></div>
+      </div>
+    </div>
+
+    <div class="card glass">
+      <h3 class="card-title"><i class="fas fa-cogs"></i> <span data-i18n="specs">技术规格</span></h3>
+      <div class="spec-item"><div class="spec-label" data-i18n="engine">开发引擎</div><div class="spec-value">Unity</div></div>
+      <div class="spec-item"><div class="spec-label" data-i18n="size">游戏大小</div><div class="spec-value">469 MB</div></div>
+      <div class="spec-item"><div class="spec-label" data-i18n="version">当前版本</div><div class="spec-value">1.0.6</div></div>
+      <div class="spec-item"><div class="spec-label" data-i18n="platform">支持平台</div><div class="spec-value">Android 5.1(API22+)</div></div>
+      <div class="spec-item"><div class="spec-label" data-i18n="release">发布日期</div><div class="spec-value">2025年3月</div></div>
+    </div>
+
+    <div class="card glass" id="download">
+      <h3 class="card-title"><i class="fas fa-download"></i> <span data-i18n="download">立即下载</span></h3>
+      <a href="https://qfile.qq.com/q/RATxYOFxaS" target="_blank" rel="noopener noreferrer" class="btn btn-download active">
+        <i class="fas fa-download"></i> <span data-i18n="netdisk">网盘下载(手机版)</span>
+      </a>
+      <a href="https://qfile.qq.com/q/RATxYOFxaS" target="_blank" rel="noopener noreferrer" class="btn btn-download btn-gitlab">
+        <i class="fab fa-gitlab"></i> <span data-i18n="gitlab">GitLab(手机版)</span>
+      </a>
+      <a href="https://store.steampowered.com/app/1017180/The_Long_Drive/" target="_blank" rel="noopener noreferrer" class="btn btn-download btn-steam">
+        <i class="fab fa-steam"></i> <span data-i18n="steam">Steam(PC原版)</span>
+      </a>
+      <a href="http://s.7723.cn/202611211749/98fa6f0b01ec0ae8ca7b9228d901cb99/up/2428936/556850" target="_blank" rel="noopener noreferrer" class="btn btn-download btn-7723">
+        <i class="fas fa-mobile-screen-button"></i> 7723 游戏下载
+      </a>
+      <p style="margin-top:10px;font-size:12px;color:var(--md-sub);text-align:center;" data-i18n="tip">无广告 | 免内购 | 完整内容</p>
+    </div>
+
+    <div class="card glass">
+      <h3 class="card-title"><i class="fas fa-image"></i> <span data-i18n="screenshots">游戏截图</span></h3>
+      <div class="screenshot-grid">
+        <div class="screenshot" role="img" aria-label="The Long Drive 游戏截图" style="background-image:url(&quot;https://images.ali213.net/picfile/pic/2019/10/07/201910073370197.jpg&quot;)"></div>
+        <div class="screenshot" role="img" aria-label="The Long Drive 游戏截图" style="background-image:url(&quot;https://images.ali213.net/picfile/pic/2019/10/07/2019100733704241.jpg&quot;)"></div>
+        <div class="screenshot" role="img" aria-label="The Long Drive 游戏截图" style="background-image:url(&quot;https://images.ali213.net/picfile/pic/2019/10/07/2019100733706593.jpg&quot;)"></div>
+        <div class="screenshot" role="img" aria-label="The Long Drive 游戏截图" style="background-image:url(&quot;https://images.ali213.net/picfile/pic/2019/10/07/2019100733712438.jpg&quot;)"></div>
+      </div>
+    </div>
+
+    <div class="card glass">
+      <h3 class="card-title"><i class="fas fa-question-circle"></i> <span data-i18n="faq">常见问题</span></h3>
+      <div class="faq-list">
+        <div class="faq-item">
+          <button type="button" class="faq-question" aria-expanded="false" aria-controls="faq-answer-1"><span data-i18n="q1">油箱如何打开？</span><i class="fas fa-chevron-down" aria-hidden="true"></i></button>
+          <div class="faq-answer" id="faq-answer-1" data-i18n="a1" aria-hidden="true">长按油箱盖位置即可打开，也可安装修复文件优化。</div>
+        </div>
+        <div class="faq-item">
+          <button type="button" class="faq-question" aria-expanded="false" aria-controls="faq-answer-2"><span data-i18n="q2">画面质量低怎么办？</span><i class="fas fa-chevron-down" aria-hidden="true"></i></button>
+          <div class="faq-answer" id="faq-answer-2" data-i18n="a2" aria-hidden="true">为适配中低端设备已做压缩优化，保证流畅运行。</div>
+        </div>
+        <div class="faq-item">
+          <button type="button" class="faq-question" aria-expanded="false" aria-controls="faq-answer-3"><span data-i18n="q3">我的手机能玩吗？</span><i class="fas fa-chevron-down" aria-hidden="true"></i></button>
+          <div class="faq-answer" id="faq-answer-3" data-i18n="a3" aria-hidden="true">支持Android 5.1及以上系统</div>
+        </div>
+        <div class="faq-item">
+          <button type="button" class="faq-question" aria-expanded="false" aria-controls="faq-answer-4"><span data-i18n="q4">有广告/内购吗？</span><i class="fas fa-chevron-down" aria-hidden="true"></i></button>
+          <div class="faq-answer" id="faq-answer-4" data-i18n="a4" aria-hidden="true">纯单机，无任何广告、内购，全部功能免费解锁。</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card glass">
+      <h3 class="card-title"><i class="fas fa-history"></i> <span data-i18n="update">更新日志</span></h3>
+      <div class="update-item">
+        <div class="update-version">最新版本</div>
+        <div class="update-date">The Long Drive Mobile</div>
+        <div class="update-description" data-i18n="updateTagline">完美的长途旅行版本</div>
+      </div>
+    </div>
+
+    <div class="card glass">
+      <h3 class="card-title"><i class="fas fa-users"></i> <span data-i18n="community">社区支持</span></h3>
+      <div class="community-grid">
+        <a href="https://discord.gg/geneserver" target="_blank" rel="noopener noreferrer" class="btn community-btn"><i class="fab fa-discord"></i> Discord</a>
+        <a href="https://github.com/MfsGame/The-long-drive-mobile" target="_blank" rel="noopener noreferrer" class="btn community-btn"><i class="fab fa-github"></i> GitHub</a>
+        <a href="https://links.8uid.com/d/92ef8dba37fa8ef667663ef795c35234" target="_blank" rel="noopener noreferrer" class="btn community-btn"><i class="fab fa-gitlab"></i> GitLab</a>
+        <a href="https://qun.qq.com/universal-share/share?ac=1&authKey=lP7DVkEr3%2BlqriDW%2Fz%2B8CvVwuQx5rAqRr4%2Bh22%2FPdRnH0Qw7yuSeoUliNJfRnbLn&busi_data=eyJncm91cENvZGUiOiI5NjM5NjA4NzgiLCJ0b2tlbiI6IkJQRDJ2cEJ5U09hTWdKeWVwR1E3NUZWWlhldUVTTVBaU0t6Z0N6Y0ZhWVJvRW96elBUNmZpSlFGVDIxN05keisiLCJ1aW4iOiIzODA3NjE3NzAzIn0%3D&data=am2xsyy3kW-jBL0j2w3IgpljdJKkQha8fDPZvI2wYHIzws9j9jGyDiVsyEBXJ0_hxpVxE2lmpErKnU69EkU2oA&svctype=4&tempid=h5_group_info" target="_blank" rel="noopener noreferrer" class="btn community-btn"><i class="fab fa-qq"></i> QQ群 724639952</a>
+      </div>
+    </div>
+
+    <div class="card glass">
+      <h3 class="card-title"><i class="fas fa-book"></i> <span data-i18n="tutorial">开发教程</span></h3>
+      <div class="tutorial-grid">
+        <button class="btn tutorial-btn" data-target="unityModal"><i class="fab fa-unity"></i> <span data-i18n="t1">Unity反编译</span></button>
+        <button class="btn tutorial-btn" data-target="assetModal"><i class="fas fa-file-export"></i> <span data-i18n="t2">AssetStudio</span></button>
+        <button class="btn tutorial-btn" data-target="monoModal"><i class="fas fa-cogs"></i> <span data-i18n="t3">Mono/il2cpp</span></button>
+      </div>
+      <p style="margin-top:10px;font-size:12px;color:var(--md-sub);text-align:center;" data-i18n="tutorial_desc">移植与逆向基础教程，持续更新</p>
+    </div>
+
+    <div class="card glass">
+      <div class="dynamic-text" id="textBox"></div>
+    </div>
+  </div>
+</main>
+
+<div class="visit-counter" id="visit">访问：--</div>
+<button type="button" id="toTop" class="glass" aria-label="返回顶部">↑</button>
+<div class="toast" id="toast"></div>
+
+<div class="bar footer-bar glass">
+  <button class="btn footer-btn" data-i18n="agreement">免责</button>
+  <button class="btn footer-btn" data-i18n="user">协议</button>
+  <button class="btn footer-btn" data-i18n="privacy">隐私</button>
+</div>
+
+<div class="modal-overlay" id="agreementModal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="modal-box glass">
+    <button type="button" class="modal-close" aria-label="Close dialog">×</button>
+    <div class="modal-title" data-i18n="agreement">免责条款</div>
+    <div class="agreement-text" id="agreementContent"></div>
+  </div>
+</div>
+<div class="modal-overlay" id="userModal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="modal-box glass">
+    <button type="button" class="modal-close" aria-label="Close dialog">×</button>
+    <div class="modal-title" data-i18n="user">用户协议</div>
+    <div class="agreement-text" id="userContent"></div>
+  </div>
+</div>
+<div class="modal-overlay" id="privacyModal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="modal-box glass">
+    <button type="button" class="modal-close" aria-label="Close dialog">×</button>
+    <div class="modal-title" data-i18n="privacy">隐私政策</div>
+    <div class="agreement-text" id="privacyContent"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="unityModal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="modal-box glass">
+    <button type="button" class="modal-close" aria-label="Close dialog">×</button>
+    <div class="modal-title" data-i18n="t1">Unity 反编译基础教程</div>
+    <div class="agreement-text" id="unityContent"></div>
+  </div>
+</div>
+<div class="modal-overlay" id="assetModal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="modal-box glass">
+    <button type="button" class="modal-close" aria-label="Close dialog">×</button>
+    <div class="modal-title" data-i18n="t2">AssetStudio 使用教程</div>
+    <div class="agreement-text" id="assetContent"></div>
+  </div>
+</div>
+<div class="modal-overlay" id="monoModal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="modal-box glass">
+    <button type="button" class="modal-close" aria-label="Close dialog">×</button>
+    <div class="modal-title" data-i18n="t3">Mono vs il2cpp 讲解</div>
+    <div class="agreement-text" id="monoContent"></div>
+  </div>
+</div>
+
+<script>
+const i18n = {
+  zh: {
+    title: "长途旅行 - 手机移植版",
+    desc: "《The Long Drive》是一款独特的休闲驾驶模拟游戏，背景设定在广阔无垠的沙漠公路中。现在移植，您可以在手机上体验这款备受好评的独立游戏。",
+    features: "游戏特色",
+    f1: "广阔开放世界沙漠",f2: "完全自定义车辆",f3: "真实车辆维护系统",f4: "动态昼夜与天气",f5: "探索废弃建筑",f6: "移动端专属优化",
+    specs: "技术规格",engine:"开发引擎",size:"游戏大小",version:"当前版本",platform:"支持平台",release:"发布日期",
+    download: "立即下载",netdisk:"网盘下载(手机版)",gitlab:"GitLab(手机版)",steam:"Steam(PC原版)",
+    screenshots: "游戏截图",faq: "常见问题",update: "更新日志",community: "社区支持",
+    tip: "无广告 | 无内购 | 完整内容",visit:"访问量",
+    q1:"油箱如何打开？",q2:"画面质量低怎么办？",q3:"我的手机能玩吗？",q4:"有广告/内购吗？",
+    a1:"长按油箱盖位置即可打开，也可安装修复文件优化。",a2:"为适配中低端设备已做压缩优化，保证流畅运行。",a3:"支持Android 5.1及以上系统，全设备适配。",a4:"纯单机，无任何广告、内购，全部功能免费解锁。",
+    log1:"• 优化性能，减少内存占用\n• 修复崩溃问题\n• 改进触摸控制\n• 新增GitLab渠道",
+    log2:"• 新增修复文件\n• 优化渲染\n• 修复中文",
+    agreement: "免责",user: "协议",privacy: "隐私",
+    tutorial:"开发教程",tutorial_desc:"移植与逆向基础教程，持续更新",
+    updateTagline:"完美的长途旅行版本",
+    t1:"Unity反编译",t2:"AssetStudio",t3:"Mono/il2cpp",
+    agreement_content:`一、网站性质
+本网站为非官方第三方社区平台，仅提供免费游戏工具、汉化补丁、移植版本分享，无任何商业行为。
+二、版权说明
+游戏本体、商标、美术、代码等版权均归官方开发者Genesz所有。本站内容仅为学习交流使用，无侵权行为。
+三、使用风险
+用户自愿下载使用，因使用软件造成的设备故障、数据丢失、系统异常等问题由用户自行承担，本站不承担任何法律责任。
+四、服务说明
+本站免费、无捆绑、无广告、无收费。如官方要求下架内容，将立即配合处理。
+五、最终解释权
+本站拥有对本条款的最终解释权，有权随时更新内容。`,
+    userContent:`用户协议
+一、使用资格
+用户必须年满8周岁或在监护人陪同下使用本网站服务。使用即代表同意本协议全部条款。
+二、使用规范
+用户不得利用本站内容进行违法、侵权、商业盈利、恶意传播等行为。禁止逆向工程、破解、篡改本站提供的文件，禁止用于非法用途。
+三、用户义务
+用户应遵守当地法律法规，尊重原创版权，支持正版游戏。不得恶意攻击网站、传播虚假信息、骚扰开发者与其他用户。
+四、服务条款
+本站提供免费下载服务，不保证文件永久可用，可随时调整内容。不对下载速度、文件兼容性、使用效果做出任何明示或暗示担保。
+五、免责范围
+因使用本站服务导致的设备故障、系统损坏、账号异常、数据丢失等，本站均不负责。因网络问题、第三方软件、系统环境等造成的一切问题，均与本站无关。
+六、协议修改
+本站可随时修改协议内容，修改后将立即生效，继续使用视为接受新条款。
+七、适用法律
+本协议适用当地法律法规，如有争议，以运营者所在地相关规定为准。`,
+    privacyContent:`隐私政策
+一、信息收集
+本网站不会主动收集用户姓名、电话、地址、账号密码等个人隐私信息。仅在必要时通过浏览器本地存储保存主题、语言偏好，不上传至服务器。
+二、日志信息
+网站可能记录访问时间、IP地址、浏览器信息等，仅用于安全与稳定性分析，不会泄露给第三方。
+三、Cookie使用
+本站使用少量本地存储数据用于保存用户设置，不用于追踪、广告或其他商业目的。
+四、第三方链接
+本站包含QQ群、Discord、GitHub、GitLab等第三方链接，第三方平台有自己的隐私政策，本站不负责其行为。
+五、信息安全
+本站采取合理安全措施保护用户数据，防止泄露、篡改、丢失，但不保证绝对安全。
+六、儿童隐私
+本服务不面向13周岁以下儿童，若发现收集儿童信息将立即删除。
+七、隐私政策更新
+本条款可随时更新，重大变更将在网站公示，继续使用视为接受更新。
+八、联系我们
+如对隐私政策有疑问，可通过QQ群联系管理员。`,
+    unityContent:`【Unity 反编译完整教程】
+一、适用场景
+本游戏为Unity il2cpp 版本，可直接反编译修改逻辑、数值、界面、功能。
+
+二、必备工具
+1. dnSpy-net-win64：C#反编译神器
+2. AssetStudio：资源提取工具
+3. MT管理器/APKMirror：解包APK
+
+三、操作步骤
+1. 解包APK，提取 /assets/bin/Data/Managed/ 目录
+2. 找到  global .dat 和ilb中的2cpp文件
+3. 用il2cppdumper反编译
+4. AssetStudio/UABEA查看/修改
+5. 保存
+6. 保存替换回APK
+7.（手机版暂不支持，PC端支持）
+
+四、可修改内容
+• 车辆油量、速度、耐久
+• UI文字、界面逻辑
+
+五、注意事项
+• 仅用于学习研究，禁止商业与破解用途
+• 修改后需重新签名才能安装
+• 长途旅行手机版为il2cpp，有il2cpp加密`,
+    assetContent:`【AssetStudio 完整使用教程】
+一、工具作用
+提取Unity游戏内所有资源：贴图、模型、音效、UI、字体、材质、动画
+
+二、使用步骤
+1. 下载最新版 AssetStudioGUI
+2. 点击 File → Load Folder，选择游戏assets目录
+3. 等待资源加载完成
+4. 左侧筛选资源类型：Texture2D、AudioClip、Mesh、Font等
+5. 右上角搜索关键词快速定位
+6. 选中资源 → 右键 → Export Selected Assets
+7. 自动导出到指定文件夹
+
+三、支持格式
+图片：PNG、JPG、TGA
+模型：FBX、OBJ
+音频：WAV、MP3
+其他：材质、Shader、字体、文本
+
+四、常见用途
+• 游戏汉化（修改图片文字）
+• 自制MOD、移植参考
+• 提取壁纸、素材
+• 修复游戏资源错误`,
+    monoContent:`【Mono 与 il2cpp 深度讲解】
+一、Mono（PC游戏使用）
+• 运行方式：C# 脚本即时编译运行
+• 优点：反编译简单、修改方便、包体小、兼容性极强
+• 缺点：安全性低，易被修改
+• 适用：中小游戏、学习调试、移植版本
+• 文件：Assembly-CSharp.dll 可直接编辑
+
+二、il2cpp
+• 运行方式：C# 预先编译为C++再打包
+• 优点：运行速度快、安全性高、防破解
+• 缺点：包体大、反编译难度高、调试麻烦
+• 适用：大型商业游戏、正式上线项目
+• 文件：libil2cpp.so + global-metadata.dat
+
+三、如何判断游戏类型
+• 看APK结构：
+  - 有Assembly-CSharp.dll → Mono
+  - 有libil2cpp.so → il2cpp
+
+四、移植建议
+• 学习逆向：优先选Mono游戏
+• 发布项目：推荐il2cpp加固
+• 本游戏：il2cpp，不易修改与汉化`,
+    texts: ["免费无广告","安全纯净","持续更新","完美移植","沙漠公路之旅"]
+  },
+  en: {
+    title: "The Long Drive Mobile",
+    desc: "The Long Drive is a unique casual driving simulation game set in a vast desert. Now you can experience this highly acclaimed indie game on your mobile device.",
+    features: "Features",
+    f1: "Vast Open World Desert",f2: "Fully Customizable Vehicles",f3: "Realistic Vehicle System",f4: "Dynamic Day/Night & Weather",f5: "Explore Abandoned Buildings",f6: "Mobile-Optimized",
+    specs: "Specifications",engine:"Engine",size:"Size",version:"Version",platform:"Platform",release:"Release",
+    download: "Download",netdisk:"NetDisk (Mobile)",gitlab:"GitLab (Mobile)",steam:"Steam (PC)",
+    screenshots: "Screenshots",faq: "FAQ",update: "Updates",community: "Community",
+    tip: "No Ads | No IAP | Full Game",visit:"Visits",
+    q1:"How to open fuel tank?",q2:"Low graphics quality?",q3:"Is my phone compatible?",q4:"Ads or in-app purchases?",
+    a1:"Long press the fuel cap to open it, or install the fix file.",a2:"Optimized for low-end devices to ensure smooth running.",a3:"Supports Android 5.1 and above, compatible with all devices.",a4:"Pure offline game, no ads, no IAP, all unlocked.",
+    log1:"• Optimize performance\n• Fix crashes\n• Improve touch controls\n• Add GitLab channel",
+    log2:"• Add fix files\n• Optimize rendering\n• Fix Chinese",
+    agreement: "Disclaimer",user: "Terms",privacy: "Privacy",
+    tutorial:"Tutorials",tutorial_desc:"Modding & Reverse Basics",
+    updateTagline:"The perfect Long Drive version",
+    t1:"Unity Decompile",t2:"AssetStudio",t3:"Mono/il2cpp",
+    agreement_content:`1. Website Nature
+This is an unofficial third-party platform providing free game tools, patches and ports for non-commercial use only.
+2. Copyright
+All game assets, trademarks and code belong to the original developer Genesz. Content is for learning only.
+3. Risk
+Users download and use files voluntarily. The site is not responsible for device issues, data loss or system damage.
+4. Service
+Free, no ads, no bundles, no payment. Content will be removed if requested by the official team.
+5. Rights
+We reserve the right to update these terms at any time.`,
+    userContent:`User Agreement
+1. Eligibility
+Users must be at least 8 years old or use under supervision. Use constitutes acceptance of all terms.
+2. Rules
+Do not use content for illegal, commercial or harmful purposes. Do not reverse engineer, crack or modify provided files.
+3. Obligations
+Follow local laws, respect copyright and support official games. Do not attack the site or harass developers and users.
+4. Service
+Free downloads are provided but not guaranteed permanently. No warranties for speed, compatibility or performance.
+5. Liability
+We are not liable for device issues, data loss, account problems or system damage from using this site.
+6. Changes
+Terms may be updated at any time; continued use means acceptance.
+7. Law
+Goverened by local laws.`,
+    privacyContent:`Privacy Policy
+1. Data Collection
+We do NOT collect personal information such as name, phone, address or passwords. Only local storage for theme and language preferences, no server upload.
+2. Logs
+Basic access logs (time, IP, browser) for security only; not shared with third parties.
+3. Cookies
+Local storage used only for settings; no tracking or advertising.
+4. Third-party Links
+Links to QQ, Discord, GitHub, GitLab have their own policies; we are not responsible for them.
+5. Security
+Reasonable measures to protect data, but no absolute security guarantee.
+6. Children
+Not intended for children under 13.
+7. Updates
+Policy may change; significant changes will be posted.
+8. Contact
+Reach us via QQ group if you have questions.`,
+    unityContent:`[Unity Decompile Tutorial]
+1. This game uses il2cpp, not easy to decompile
+2. Tools: dnSpy, AssetStudio, MT Manager
+3. Extract Assembly-CSharp.dll
+4. Open with dnSpy to edit code
+5. Save, replace, re-sign APK
+6. Can edit: car stats, UI, text, logic
+Only for education`,
+    assetContent:`[AssetStudio Tutorial]
+1. Open AssetStudio
+2. Load game assets folder
+3. View texture, audio, model
+4. Filter & search resources
+5. Export selected files
+Support: PNG, FBX, WAV, shader`,
+    monoContent:`[Mono vs il2cpp]
+Mono:
+• Easy to decompile
+• Small size
+• Used in this game
+il2cpp:
+• Safe & fast
+• Hard to modify
+• For big games`,
+    texts: ["Free No Ads","Safe & Clean","Stable Updates","Perfect Port","Desert Road Trip"]
+  },
+  ru: {
+    title: "Дальняя дорога - Мобильная версия",
+    desc: "The Long Drive — это уникальная симуляция вождения, действие которой происходит в бескрайней пустыне. Теперь вы можете играть в эту популярную инди-игру на своём мобильном устройстве.",
+    features: "Особенности",
+    f1: "Огромный открытый мир",f2: "Полная настройка машины",f3: "Реальная система обслуживания",f4: "Динамический день/ночь и погода",f5: "Исследование заброшенных зданий",f6: "Оптимизация для мобильных",
+    specs: "Характеристики",engine:"Движок",size:"Размер",version:"Версия",platform:"Платформа",release:"Релиз",
+    download: "Скачать",netdisk:"Скачать (мобиль)",gitlab:"GitLab (мобиль)",steam:"Steam (ПК)",
+    screenshots: "Скриншоты",faq: "Вопросы",update: "Обновления",community: "Сообщество",
+    tip: "Нет рекламы | Нет покупок | Полная версия",visit:"Посещения",
+    q1:"Как открыть бак?",q2:"Низкое качество графики?",q3:"Подходит ли мой телефон?",q4:"Есть реклама или покупки?",
+    a1:"Долго нажмите на крышку бака, или установите файл исправления.",a2:"Оптимизировано для слабых устройств, чтобы обеспечить плавность.",a3:"Поддерживается Android 5.1 и выше, совместимо со всеми устройствами.",a4:"Офлайн игра, нет рекламы и покупок, всё открыто.",
+    log1:"• Оптимизирована производительность\n• Исправлены сбои\n• Улучшено управление\n• Добавлен канал GitLab",
+    log2:"• Добавлены файлы исправлений\n• Оптимизирована графика\n• Исправлен китайский язык",
+    agreement: "Отказ",user: "Условия",privacy: "Конфиденциальность",
+    tutorial:"Учебники",tutorial_desc:"Основы моддинга и реверса",
+    updateTagline:"Идеальная версия The Long Drive",
+    t1:"Декомпиляция Unity",t2:"AssetStudio",t3:"Mono/il2cpp",
+    agreement_content:`1. Характер сайта
+Это неофициальная платформа, предоставляющая бесплатные инструменты, переводы и порты без коммерческой цели.
+2. Авторские права
+Все права на игру принадлежат разработчику Genesz. Контент только для обучения.
+3. Риски
+Пользователь использует файлы на свой страх и риск. Сайт не отвечает за поломки устройства и потерю данных.
+4. Услуги
+Бесплатно, без рекламы и скрытых программ. Контент удалим по запросу официальных разработчиков.
+5. Права
+Мы оставляем за собой право изменять правила.`,
+    userContent:`Пользовательское соглашение
+1. Возраст
+Пользователь должен быть старше 8 лет или использовать под присмотром.
+2. Правила
+Запрещено использовать контент в незаконных целях. Запрещено взламывать файлы.
+3. Обязанности
+Соблюдайте законы, уважайте авторские права и поддерживайте официальную игру.
+4. Услуги
+Бесплатные загрузки без гарантий постоянной работы.
+5. Ответственность
+Мы не отвечаем за поломки устройства, потерю данных и проблемы с аккаунтами.
+6. Изменения
+Правила могут обновляться.
+7. Закон
+Действует местное законодательство.`,
+    privacyContent:`Политика конфиденциальности
+1. Сбор данных
+Мы НЕ собираем личные данные: имя, телефон, пароли. Сохраняем только тему и язык локально.
+2. Логи
+Записываем время доступа, IP и браузер для безопасности, не передаём третьим лицам.
+3. Файлы cookie
+Используем только для настроек, без рекламы и отслеживания.
+4. Ссылки
+Ссылки на QQ, Discord, GitHub, GitLab имеют свои политики.
+5. Безопасность
+Принимаем меры для защиты данных, но без абсолютной гарантии.
+6. Дети
+Сервис не предназначен для детей до 13 лет.
+7. Обновления
+Политика может изменяться.
+8. Связь
+Свяжитесь с нами через QQ-группу.`,
+    unityContent:`[Учебник по декомпиляции Unity]
+1. Игра использует Mono, легко декомпилировать
+2. Инструменты: dnSpy, AssetStudio
+3. Извлеките Assembly-CSharp.dll
+4. Откройте в dnSpy и измените код
+5. Сохраните и подпишите APK
+Только для обучения`,
+    assetContent:`[Учебник по AssetStudio]
+1. Откройте AssetStudio
+2. Загрузите папку assets
+3. Просмотр текстур, аудио, моделей
+4. Фильтр и поиск
+5. Экспорт выбранных файлов`,
+    monoContent:`[Mono vs il2cpp]
+Mono:
+• Легко декомпилировать
+• Малый размер
+• Используется в игре
+
+il2cpp:
+• Безопасно
+• Сложно изменить
+• Для больших игр`,
+    texts: ["Бесплатно","Без рекламы","Стабильно","Идеальный порт","Пустыня"]
+  }
+};
+
+
+(() => {
+  'use strict';
+
+  const $ = (selector, scope = document) => scope.querySelector(selector);
+  const $$ = (selector, scope = document) => Array.from(scope.querySelectorAll(selector));
+  const byId = id => document.getElementById(id);
+  const allowedLanguages = ['zh', 'en', 'ru'];
+  const storage = {
+    get(key, fallback = null) {
+      try { const value = localStorage.getItem(key); return value === null ? fallback : value; }
+      catch (_) { return fallback; }
+    },
+    set(key, value) {
+      try { localStorage.setItem(key, String(value)); return true; }
+      catch (_) { return false; }
+    }
+  };
+  const session = {
+    get(key) { try { return sessionStorage.getItem(key); } catch (_) { return null; } },
+    set(key, value) { try { sessionStorage.setItem(key, String(value)); } catch (_) {} }
+  };
+
+  let currentLang = storage.get('lang', 'zh');
+  if (!allowedLanguages.includes(currentLang)) currentLang = 'zh';
+  let textIndex = 0;
+  let textTimer = null;
+  let textFadeTimer = null;
+  let toastTimer = null;
+  let currentModal = null;
+  let previousFocus = null;
+  let previousBodyOverflow = '';
+
+  const root = document.documentElement;
+  const textBox = byId('textBox');
+  const visitEl = byId('visit');
+  const toast = byId('toast');
+  const toTop = byId('toTop');
+  const themeToggle = byId('themeToggle');
+
+  function showToast(message) {
+    if (!toast) return;
+    toast.textContent = message;
+    toast.classList.add('show');
+    window.clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => toast.classList.remove('show'), 1800);
+  }
+
+  function updateVisitCounter() {
+    if (!visitEl) return;
+    visitEl.textContent = `${i18n[currentLang].visit || 'Visits'}：${storage.get('visit', '0')}`;
+  }
+
+  function addVisit() {
+    if (session.get('hasCount')) return;
+    const oldCount = Number.parseInt(storage.get('visit', '0'), 10);
+    const count = (Number.isFinite(oldCount) && oldCount >= 0 ? oldCount : 0) + 1;
+    storage.set('visit', count);
+    session.set('hasCount', '1');
+  }
+
+  function updateText() {
+    if (!textBox) return;
+    const messages = (i18n[currentLang] && i18n[currentLang].texts) || i18n.zh.texts;
+    if (!Array.isArray(messages) || messages.length === 0) return;
+    textBox.classList.add('is-changing');
+    window.clearTimeout(textFadeTimer);
+    textFadeTimer = window.setTimeout(() => {
+      textBox.textContent = messages[textIndex % messages.length];
+      textIndex += 1;
+      textBox.classList.remove('is-changing');
+    }, 140);
+  }
+
+  function restartText() {
+    window.clearInterval(textTimer);
+    window.clearTimeout(textFadeTimer);
+    textIndex = 0;
+    updateText();
+    textTimer = window.setInterval(updateText, 3600);
+  }
+
+  function renderLang() {
+    const dictionary = i18n[currentLang] || i18n.zh;
+    $$('[data-i18n]').forEach(element => {
+      const key = element.dataset.i18n;
+      if (Object.prototype.hasOwnProperty.call(dictionary, key)) {
+
+        element.textContent = dictionary[key];
+      }
+    });
+
+    document.title = dictionary.title || i18n.zh.title;
+    root.lang = currentLang === 'zh' ? 'zh-CN' : currentLang;
+
+    const contentPairs = [
+      ['agreementContent', 'agreement_content'],
+      ['userContent', 'userContent'],
+      ['privacyContent', 'privacyContent'],
+      ['unityContent', 'unityContent'],
+      ['assetContent', 'assetContent'],
+      ['monoContent', 'monoContent']
+    ];
+    contentPairs.forEach(([elementId, key]) => {
+      const element = byId(elementId);
+      if (element) element.textContent = dictionary[key] || i18n.zh[key] || '';
+    });
+
+    $$('.lang-btn').forEach(button => {
+      const active = button.dataset.lang === currentLang;
+      button.classList.toggle('active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+
+    updateVisitCounter();
+    restartText();
+  }
+
+  function setTheme(theme) {
+    const normalized = theme === 'dark' ? 'dark' : 'light';
+    root.setAttribute('data-theme', normalized);
+    storage.set('theme', normalized);
+    if (themeToggle) {
+      const icon = $('i', themeToggle);
+      if (icon) {
+        icon.classList.toggle('fa-moon', normalized === 'light');
+        icon.classList.toggle('fa-sun', normalized === 'dark');
+      }
+      themeToggle.setAttribute('aria-label', normalized === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+      themeToggle.setAttribute('aria-pressed', String(normalized === 'dark'));
+    }
+  }
+
+  function openModal(modal) {
+    if (!modal) return;
+    if (currentModal && currentModal !== modal) closeModal(currentModal, false);
+    previousFocus = document.activeElement;
+    currentModal = modal;
+    previousBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    modal.setAttribute('aria-hidden', 'false');
+    modal.classList.add('show');
+    const closeButton = $('.modal-close', modal);
+    if (closeButton) closeButton.focus({ preventScroll: true });
+  }
+
+  function closeModal(modal, restoreFocus = true) {
+    if (!modal) return;
+    modal.classList.remove('show');
+    modal.setAttribute('aria-hidden', 'true');
+    if (currentModal === modal) {
+      currentModal = null;
+      document.body.style.overflow = previousBodyOverflow;
+      if (restoreFocus && previousFocus && typeof previousFocus.focus === 'function') {
+        previousFocus.focus({ preventScroll: true });
+      }
+    }
+  }
+
+  function initModals() {
+    $$('.footer-btn').forEach((button, index) => {
+      const ids = ['agreementModal', 'userModal', 'privacyModal'];
+      button.addEventListener('click', () => openModal(byId(ids[index])));
+    });
+
+    $$('.tutorial-btn').forEach(button => {
+      button.addEventListener('click', () => openModal(byId(button.dataset.target)));
+    });
+
+    $$('.modal-overlay').forEach(modal => {
+      modal.addEventListener('click', event => {
+        if (event.target === modal) closeModal(modal);
+      });
+      const closeButton = $('.modal-close', modal);
+      if (closeButton) closeButton.addEventListener('click', () => closeModal(modal));
+    });
+
+    document.addEventListener('keydown', event => {
+      if (!currentModal) return;
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeModal(currentModal);
+        return;
+      }
+      if (event.key === 'Tab') {
+        const focusable = $$('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])', currentModal)
+          .filter(element => element.getClientRects().length > 0);
+        if (!focusable.length) {
+          event.preventDefault();
+          return;
+        }
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+    });
+  }
+
+  function initFaq() {
+    $$('.faq-question').forEach(button => {
+      button.addEventListener('click', () => {
+        const answerId = button.getAttribute('aria-controls');
+        const answer = answerId ? byId(answerId) : button.nextElementSibling;
+        if (!answer) return;
+        const expanded = button.getAttribute('aria-expanded') === 'true';
+        button.setAttribute('aria-expanded', String(!expanded));
+        answer.classList.toggle('active', !expanded);
+        answer.setAttribute('aria-hidden', String(expanded));
+      });
+    });
+  }
+
+  function initLanguageSwitch() {
+    $$('.lang-btn').forEach(button => {
+      button.addEventListener('click', () => {
+        const nextLanguage = button.dataset.lang;
+        if (!allowedLanguages.includes(nextLanguage) || nextLanguage === currentLang) return;
+        currentLang = nextLanguage;
+        storage.set('lang', currentLang);
+        renderLang();
+      });
+    });
+  }
+
+  function initScrollControls() {
+    if (!toTop) return;
+    const update = () => toTop.classList.toggle('show', window.scrollY > 220);
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+    toTop.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) ? 'auto' : 'smooth' });
+    });
+  }
+
+  function initTheme() {
+    const savedTheme = storage.get('theme', 'light');
+    setTheme(savedTheme);
+    if (themeToggle) {
+      themeToggle.addEventListener('click', () => {
+        const dark = root.getAttribute('data-theme') === 'dark';
+        setTheme(dark ? 'light' : 'dark');
+      });
+    }
+  }
+
+  function initExternalLinks() {
+    $$('a[target="_blank"]').forEach(anchor => {
+      const rel = new Set((anchor.getAttribute('rel') || '').split(/\s+/).filter(Boolean));
+      rel.add('noopener');
+      rel.add('noreferrer');
+      anchor.setAttribute('rel', Array.from(rel).join(' '));
+    });
+  }
+
+  function init() {
+    initTheme();
+    addVisit();
+    renderLang();
+    initLanguageSwitch();
+    initModals();
+    initFaq();
+    initScrollControls();
+    initExternalLinks();
+  }
+
+  // Content at the time of generation contained contradictory claims about the
+  // script backend. Keep the tutorials generic and teach users how to identify it.
+  i18n.zh.unityContent = `【Unity 脚本与资源分析基础】
+一、先判断脚本后端
+• Mono 项目通常包含 Managed/Assembly-CSharp.dll。
+• IL2CPP 项目通常包含 libil2cpp.so 与 global-metadata.dat。
+• 不同 Unity 版本与平台的目录结构可能不同，应结合实际文件判断。
+
+二、常用工具
+• dnSpyEx：查看和分析托管程序集，适用于 Mono 程序集或已还原的托管代码。
+• Il2CppDumper：分析 IL2CPP 二进制文件与元数据。
+• AssetStudio、UABEA：查看或编辑 Unity 资源，不负责直接反编译所有脚本逻辑。
+
+三、基本流程
+1. 先备份原始 APK 和数据文件。
+2. 解包后检查 Managed 目录、libil2cpp.so 与 global-metadata.dat。
+3. 根据实际脚本后端选择对应分析工具。
+4. 修改前确认资源版本与 Unity 版本匹配。
+5. 替换文件后重新打包，并按设备要求签名安装。
+
+四、注意事项
+• 修改前保留可回滚的原始副本。
+• 不同版本的资源结构可能不兼容。
+• 仅对自己拥有或获授权的文件进行研究。`;
+  i18n.en.unityContent = `[Unity Script and Asset Analysis Basics]
+1. Identify the scripting backend first:
+• Mono projects commonly contain Managed/Assembly-CSharp.dll.
+• IL2CPP projects commonly contain libil2cpp.so and global-metadata.dat.
+• Paths vary by Unity version and target platform; verify the actual files.
+
+2. Common tools:
+• dnSpyEx: inspect managed assemblies or restored managed code.
+• Il2CppDumper: analyze IL2CPP binaries and metadata.
+• AssetStudio and UABEA: inspect or edit Unity assets; they do not directly decompile every script.
+
+3. Basic workflow:
+1) Back up the original APK and data files.
+2) Inspect Managed, libil2cpp.so and global-metadata.dat.
+3) Choose tools according to the detected backend.
+4) Check Unity-version compatibility before editing assets.
+5) Repackage and sign the modified APK as required.
+
+Only inspect files you own or are authorized to modify.`;
+  i18n.ru.unityContent = `[Основы анализа скриптов и ресурсов Unity]
+1. Сначала определите backend:
+• В проектах Mono обычно есть Managed/Assembly-CSharp.dll.
+• В проектах IL2CPP обычно есть libil2cpp.so и global-metadata.dat.
+• Пути зависят от версии Unity и платформы — проверяйте реальные файлы.
+
+2. Инструменты:
+• dnSpyEx — анализ управляемых сборок.
+• Il2CppDumper — анализ бинарных файлов и метаданных IL2CPP.
+• AssetStudio и UABEA — просмотр и редактирование ресурсов Unity, а не декомпиляция всей логики.
+
+3. Основной процесс:
+1) Сделайте резервную копию APK и данных.
+2) Проверьте каталоги Managed, libil2cpp.so и global-metadata.dat.
+3) Выберите инструменты по типу backend.
+4) Проверьте совместимость версии Unity.
+5) Пересоберите и подпишите APK при необходимости.
+
+Работайте только с файлами, которые принадлежат вам или на изменение которых есть разрешение.`;
+
+  i18n.zh.monoContent = `【Mono 与 IL2CPP 区别】
+Mono：
+• C# 程序集以托管程序集形式运行。
+• 常见文件包括 Managed/Assembly-CSharp.dll。
+• 通常可使用 dnSpyEx 等工具查看程序集。
+
+IL2CPP：
+• C# 代码会经过转换并编译为原生代码。
+• 常见文件包括 libil2cpp.so 与 global-metadata.dat。
+• 通常需要专用工具分析二进制文件与元数据。
+
+判断项目类型时，请检查实际文件结构，不要仅凭游戏名称或单个文件推断。`;
+  i18n.en.monoContent = `[Mono vs. IL2CPP]
+Mono:
+• Runs managed C# assemblies.
+• Commonly includes Managed/Assembly-CSharp.dll.
+• Assemblies can often be inspected with tools such as dnSpyEx.
+
+IL2CPP:
+• Converts managed code and compiles it to native code.
+• Commonly includes libil2cpp.so and global-metadata.dat.
+• Requires tools that can analyze native binaries and metadata.
+
+Determine the backend from the actual files rather than assuming it from the game name.`;
+  i18n.ru.monoContent = `[Mono и IL2CPP]
+Mono:
+• Использует управляемые сборки C#.
+• Обычно содержит Managed/Assembly-CSharp.dll.
+• Сборки часто можно просматривать с помощью dnSpyEx.
+
+IL2CPP:
+• Преобразует управляемый код и компилирует его в нативный.
+• Обычно содержит libil2cpp.so и global-metadata.dat.
+• Для анализа нужны специальные инструменты.
+
+Определяйте backend по реальным файлам, а не по названию игры.`;
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init, { once: true });
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>
